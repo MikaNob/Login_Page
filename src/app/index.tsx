@@ -1,68 +1,116 @@
 import React, { useState } from 'react';
-import { 
-  Text, 
-  View, 
-  TextInput, 
-  TouchableOpacity, 
-  KeyboardAvoidingView, 
-  Platform 
+import {
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  TextInput,
+  TextInputProps,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+
+type Mode = 'login' | 'register';
+
+function Field({ icon, ...props }: TextInputProps & { icon: keyof typeof Ionicons.glyphMap }) {
+  return (
+    <View className="mb-3 flex-row items-center rounded-xl border border-slate-200 bg-slate-50 px-4">
+      <Ionicons name={icon} size={20} color="#64748b" />
+      <TextInput
+        className="ml-3 h-12 flex-1 text-base text-slate-800"
+        placeholderTextColor="#94a3b8"
+        autoCapitalize="none"
+        {...props}
+      />
+    </View>
+  );
+}
 
 export default function LoginScreen() {
-  const [username, setUsername] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [mode, setMode] = useState<Mode>('login');
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = () => {
-    console.log('Mencoba login dengan username:', username);
-  };
+  const isLogin = mode === 'login';
 
   return (
-    <KeyboardAvoidingView 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
-      className="flex-1 bg-[#8ad6bfa8] items-center justify-center p-5"
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      className="flex-1 bg-sky-100"
     >
-      <View className="bg-[#ebd0d0] rounded-[24px] p-7 w-full max-w-[400px] shadow-xl elevation-10">
-        
-        <View className="items-center mb-8">
-          <Ionicons name="school" size={64} color="#e4c309" />
-          <Text className="text-[28px] font-extrabold text-[#e69a0d] mt-4">Education Login</Text>
-          <Text className="text-[14px] text-[#ca6608] mt-2 text-center leading-5">
-            Login untuk dapatkan materi yang mantap JIWA ASIK!!!!!!
-          </Text>
-        </View>
+      <ScrollView
+        contentContainerClassName="flex-grow items-center justify-center p-5"
+        keyboardShouldPersistTaps="handled"
+      >
+        <View className="w-full max-w-[400px] rounded-3xl bg-white p-6 shadow-md">
+          <View className="mb-6 items-center">
+            <View className="flex-row gap-2">
+              <View className="h-14 w-14 items-center justify-center rounded-2xl bg-sky-100">
+                <Ionicons name="calculator" size={28} color="#0284c7" />
+              </View>
+              <View className="h-14 w-14 items-center justify-center rounded-2xl bg-amber-100">
+                <Ionicons name="code-slash" size={28} color="#d97706" />
+              </View>
+            </View>
+            <Text className="mt-4 text-2xl font-bold text-slate-800">MathCode</Text>
+            <Text className="mt-1 text-center text-sm text-slate-500">
+              Belajar matematika & coding lewat soal isian dan pilihan ganda
+            </Text>
+          </View>
 
-        <View className="flex-row items-center bg-[#fdfeff] rounded-xl mb-4 px-4 border border-[#022346]">
-          <Ionicons name="person-outline" size={20} color="#666" style={{ marginRight: 12 }} />
-          <TextInput
-            className="flex-1 h-[55px] text-[16px] text-[#333]"
-            placeholder="Username Mahasiswa/Siswa"
-            value={username}
-            onChangeText={setUsername}
-            autoCapitalize="none"
-            placeholderTextColor="#999"
-          />
-        </View>
+          <View className="mb-5 flex-row rounded-xl bg-slate-100 p-1">
+            {(['login', 'register'] as const).map((m) => (
+              <TouchableOpacity
+                key={m}
+                onPress={() => setMode(m)}
+                className={`flex-1 items-center rounded-lg py-2 ${mode === m ? 'bg-white shadow-sm' : ''}`}
+              >
+                <Text className={`font-semibold ${mode === m ? 'text-sky-600' : 'text-slate-500'}`}>
+                  {m === 'login' ? 'Masuk' : 'Daftar'}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
 
-        <View className="flex-row items-center bg-[#fdfeff] rounded-xl mb-4 px-4 border border-[#022346]">
-          <Ionicons name="lock-closed-outline" size={20} color="#666" style={{ marginRight: 12 }} />
-          <TextInput
-            className="flex-1 h-[55px] text-[16px] text-[#333]"
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            placeholderTextColor="#999"
-          />
-        </View>
+          {!isLogin && <Field icon="id-card-outline" placeholder="Nama lengkap" autoCapitalize="words" />}
+          <Field icon="person-outline" placeholder="Username" />
 
-        <TouchableOpacity 
-          className="bg-[#718aaf] rounded-xl h-[55px] items-center justify-center mt-5 shadow-md elevation-5" 
-          onPress={handleLogin}
-        >
-          <Text className="text-white text-[18px] font-bold">JUMP IN</Text>
-        </TouchableOpacity>
-      </View>
+          <View className="mb-3 flex-row items-center rounded-xl border border-slate-200 bg-slate-50 px-4">
+            <Ionicons name="lock-closed-outline" size={20} color="#64748b" />
+            <TextInput
+              className="ml-3 h-12 flex-1 text-base text-slate-800"
+              placeholder="Password"
+              placeholderTextColor="#94a3b8"
+              secureTextEntry={!showPassword}
+              autoCapitalize="none"
+            />
+            <TouchableOpacity onPress={() => setShowPassword((v) => !v)} hitSlop={8}>
+              <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color="#64748b" />
+            </TouchableOpacity>
+          </View>
+
+          {!isLogin && (
+            <Field icon="lock-closed-outline" placeholder="Konfirmasi password" secureTextEntry={!showPassword} />
+          )}
+
+          <TouchableOpacity
+            onPress={() => router.replace('/homepage')}
+            className="mt-2 h-12 items-center justify-center rounded-xl bg-sky-600"
+          >
+            <Text className="text-base font-bold text-white">{isLogin ? 'Masuk' : 'Buat Akun'}</Text>
+          </TouchableOpacity>
+
+          <View className="mt-5 flex-row justify-center">
+            <Text className="text-sm text-slate-500">
+              {isLogin ? 'Belum punya akun? ' : 'Sudah punya akun? '}
+            </Text>
+            <TouchableOpacity onPress={() => setMode(isLogin ? 'register' : 'login')}>
+              <Text className="text-sm font-semibold text-sky-600">{isLogin ? 'Daftar' : 'Masuk'}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
