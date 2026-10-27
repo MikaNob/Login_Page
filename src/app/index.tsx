@@ -14,13 +14,15 @@ import { router } from 'expo-router';
 
 type Mode = 'login' | 'register';
 
+const GMAIL_PATTERN = /^[^\s@]+@gmail\.com$/i;
+
 function Field({ icon, ...props }: TextInputProps & { icon: keyof typeof Ionicons.glyphMap }) {
   return (
     <View className="mb-3 flex-row items-center rounded-xl border border-slate-200 bg-slate-50 px-4">
       <Ionicons name={icon} size={20} color="#64748b" />
       <TextInput
         className="ml-3 h-12 flex-1 text-base text-slate-800"
-        placeholderTextColor="#94a3b8"
+        placeholderTextColor="#64748b"
         autoCapitalize="none"
         {...props}
       />
@@ -31,8 +33,37 @@ function Field({ icon, ...props }: TextInputProps & { icon: keyof typeof Ionicon
 export default function LoginScreen() {
   const [mode, setMode] = useState<Mode>('login');
   const [showPassword, setShowPassword] = useState(false);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [error, setError] = useState('');
 
   const isLogin = mode === 'login';
+
+  const switchMode = (next: Mode) => {
+    setMode(next);
+    setPassword('');
+    setConfirm('');
+    setError('');
+  };
+
+  const handleSubmit = () => {
+    if (!email.trim() || !password || (!isLogin && !name.trim())) {
+      setError('Semua kolom wajib diisi.');
+      return;
+    }
+    if (!GMAIL_PATTERN.test(email.trim())) {
+      setError('Gunakan alamat email @gmail.com.');
+      return;
+    }
+    if (!isLogin && password !== confirm) {
+      setError('Konfirmasi password tidak sama.');
+      return;
+    }
+    setError('');
+    router.replace('/homepage');
+  };
 
   return (
     <KeyboardAvoidingView
@@ -63,25 +94,36 @@ export default function LoginScreen() {
             {(['login', 'register'] as const).map((m) => (
               <TouchableOpacity
                 key={m}
-                onPress={() => setMode(m)}
+                onPress={() => switchMode(m)}
                 className={`flex-1 items-center rounded-lg py-2 ${mode === m ? 'bg-white shadow-sm' : ''}`}
               >
-                <Text className={`font-semibold ${mode === m ? 'text-sky-600' : 'text-slate-500'}`}>
+                <Text className={`font-semibold ${mode === m ? 'text-sky-700' : 'text-slate-500'}`}>
                   {m === 'login' ? 'Masuk' : 'Daftar'}
                 </Text>
               </TouchableOpacity>
             ))}
           </View>
 
-          {!isLogin && <Field icon="id-card-outline" placeholder="Nama lengkap" autoCapitalize="words" />}
-          <Field icon="person-outline" placeholder="Username" />
+          {!isLogin && (
+            <Field icon="id-card-outline" placeholder="Nama lengkap" autoCapitalize="words" value={name} onChangeText={setName} />
+          )}
+          <Field
+            icon="mail-outline"
+            placeholder="nama@gmail.com"
+            keyboardType="email-address"
+            autoComplete="email"
+            value={email}
+            onChangeText={setEmail}
+          />
 
           <View className="mb-3 flex-row items-center rounded-xl border border-slate-200 bg-slate-50 px-4">
             <Ionicons name="lock-closed-outline" size={20} color="#64748b" />
             <TextInput
               className="ml-3 h-12 flex-1 text-base text-slate-800"
               placeholder="Password"
-              placeholderTextColor="#94a3b8"
+              value={password}
+              onChangeText={setPassword}
+              placeholderTextColor="#64748b"
               secureTextEntry={!showPassword}
               autoCapitalize="none"
             />
@@ -91,12 +133,24 @@ export default function LoginScreen() {
           </View>
 
           {!isLogin && (
-            <Field icon="lock-closed-outline" placeholder="Konfirmasi password" secureTextEntry={!showPassword} />
+            <Field
+              icon="lock-closed-outline"
+              placeholder="Konfirmasi password"
+              secureTextEntry={!showPassword}
+              value={confirm}
+              onChangeText={setConfirm}
+            />
           )}
 
+          {error ? (
+            <Text className="mb-2 text-sm text-red-600" accessibilityLiveRegion="polite">
+              {error}
+            </Text>
+          ) : null}
+
           <TouchableOpacity
-            onPress={() => router.replace('/homepage')}
-            className="mt-2 h-12 items-center justify-center rounded-xl bg-sky-600"
+            onPress={handleSubmit}
+            className="mt-2 h-12 items-center justify-center rounded-xl bg-sky-700"
           >
             <Text className="text-base font-bold text-white">{isLogin ? 'Masuk' : 'Buat Akun'}</Text>
           </TouchableOpacity>
@@ -105,8 +159,8 @@ export default function LoginScreen() {
             <Text className="text-sm text-slate-500">
               {isLogin ? 'Belum punya akun? ' : 'Sudah punya akun? '}
             </Text>
-            <TouchableOpacity onPress={() => setMode(isLogin ? 'register' : 'login')}>
-              <Text className="text-sm font-semibold text-sky-600">{isLogin ? 'Daftar' : 'Masuk'}</Text>
+            <TouchableOpacity onPress={() => switchMode(isLogin ? 'register' : 'login')}>
+              <Text className="text-sm font-semibold text-sky-700">{isLogin ? 'Daftar' : 'Masuk'}</Text>
             </TouchableOpacity>
           </View>
         </View>
