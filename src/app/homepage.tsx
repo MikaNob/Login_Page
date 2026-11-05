@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { router } from 'expo-router';
 import { Icon } from '../components/Icon';
 
 type Subject = 'Matematika' | 'Coding';
@@ -19,7 +20,7 @@ export default function HomePage() {
   const [subject, setSubject] = useState<Subject>('Matematika');
   const [notice, setNotice] = useState('');
 
-  // TODO: replace with real navigation once settings, profile and quiz screens exist
+  // TODO: replace with real navigation once settings and quiz screens exist
   const comingSoon = (feature: string) => setNotice(`${feature} segera hadir.`);
 
   const pickSubject = (next: Subject) => {
@@ -44,7 +45,7 @@ export default function HomePage() {
             <TouchableOpacity
               accessibilityRole="button"
               accessibilityLabel="Profil"
-              onPress={() => comingSoon('Profil')}
+              onPress={() => router.push('/profil')}
               className="h-11 w-11 items-center justify-center rounded-full bg-blue-600"
             >
               <Icon name="person-outline" className="text-xl text-white" />
