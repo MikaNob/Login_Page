@@ -20,7 +20,7 @@ export default function HomePage() {
   const [subject, setSubject] = useState<Subject>('Matematika');
   const [notice, setNotice] = useState('');
 
-  // TODO: replace with real navigation once settings and quiz screens exist
+  // TODO: replace with real navigation once the settings screen exists
   const comingSoon = (feature: string) => setNotice(`${feature} segera hadir.`);
 
   const pickSubject = (next: Subject) => {
@@ -97,7 +97,7 @@ export default function HomePage() {
             <TouchableOpacity
               key={q.title}
               accessibilityRole="button"
-              onPress={() => comingSoon(`Soal ${q.title} ${subject}`)}
+              onPress={() => router.push({ pathname: '/detail', params: { subject, type: q.title } })}
               className={`flex-row items-center p-4 ${i > 0 ? 'border-t border-slate-100' : ''}`}
             >
               <View className="h-10 w-10 items-center justify-center rounded-lg bg-blue-50">
