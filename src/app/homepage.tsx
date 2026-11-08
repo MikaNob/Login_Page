@@ -2,19 +2,7 @@ import React, { useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { router } from 'expo-router';
 import { Icon } from '../components/Icon';
-
-type Subject = 'Matematika' | 'Coding';
-type IconName = React.ComponentProps<typeof Icon>['name'];
-
-const SUBJECTS: { name: Subject; description: string; icon: IconName; tile: string; iconColor: string }[] = [
-  { name: 'Matematika', description: 'Soal matematika dasar', icon: 'calculator-outline', tile: 'bg-blue-50', iconColor: 'text-blue-700' },
-  { name: 'Coding', description: 'Soal coding sederhana', icon: 'code-slash', tile: 'bg-amber-50', iconColor: 'text-amber-700' },
-];
-
-const QUESTION_TYPES: { title: string; description: string; icon: IconName }[] = [
-  { title: 'Isian', description: 'Lengkapi bagian yang kosong', icon: 'create-outline' },
-  { title: 'Pilihan ganda', description: 'Pilih satu jawaban yang benar', icon: 'list-outline' },
-];
+import { QUESTION_TYPES, Subject, SUBJECTS } from '../data/home';
 
 export default function HomePage() {
   const [subject, setSubject] = useState<Subject>('Matematika');
